@@ -43,20 +43,24 @@ def get_BestOriginalPrice(_art, _mark=''):
     'locationId':'18903' # минск
     }
 
-    r = requests.post(url = link+'Find2/Find/FindByDetailNum',
-                      headers = header,
-                      cookies = cookie,
-                      params = param
-                      )
+    try:
+        r = requests.post(url = link+'Find2/Find/FindByDetailNum',
+                          headers = header,
+                          cookies = cookie,
+                          params = param
+                          )
 
-    data = r.json()['data']
-    searchResult = data['searchResult']
-    detail = searchResult['OriginalDetailsGroups']
+        data = r.json()['data']
+        search_result = data['searchResult']
+        detail = search_result['OriginalDetailsGroups']
+        # result.update({'art':good['DetailNum'], 'mark':good['MakeName'], 'price':good['BestOriginalPrice']} for good in detail if (_mark=='' or _mark.upper() in good['MakeName'].upper())})
+    except:
+        return [{'searchart': _art,'searchmark': _mark, 'art':'', 'mark': '', 'price':0, 'error': sys.exc_info()[0]}]
 
-    # for good in detail:
-    #     print(good['DetailNum'], good['MakeName'], good['BestOriginalPrice'])
-
-    return [{'art':good['DetailNum'], 'mark':good['MakeName'], 'price':good['BestOriginalPrice']} for good in detail if (_mark=='' or _mark.upper() in good['MakeName'].upper())]
+    if len(detail) > 0:
+        return [{'searchart': _art,'searchmark': _mark,'art':good['DetailNum'], 'mark':good['MakeName'], 'price':good['BestOriginalPrice'], 'error': ''} for good in detail if (_mark=='' or _mark.upper() in good['MakeName'].upper())]
+    else:
+        return [{'searchart': _art,'searchmark': _mark,'art':'', 'mark':'', 'price':0, 'error': ''}]
 
 
 link = 'https://www.emex.ru/'
@@ -72,14 +76,18 @@ header = {
     'DNT': '1',
     }
 
+cookie = get_cookies(link, header)
+
 if __name__ == '__main__':
 
-    cookie = get_cookies(link, header)
-
     res = []
-    res += (get_BestOriginalPrice('oc47', 'knecht'))
-    res += (get_BestOriginalPrice('oc95', ''))
-    print(res)
+    res += (get_BestOriginalPrice('sadfasd', ''))
+    res += (get_BestOriginalPrice('', ''))
+    res += (get_BestOriginalPrice('oc47', ''))
+    res += (get_BestOriginalPrice('oc95', 'knecht'))
+
+    for i in res:
+        print(i)
 
     # print(r.json())
 
